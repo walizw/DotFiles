@@ -1,0 +1,217 @@
+* Emacs Settings
+
+These are my emacs settings, they are mainly for python development, I try to
+keep everything as minimalistic as possible, but there are some other things I
+literally just have installed to flex and things like that hehehe. I hope you
+like my configs :3
+
+** Installing packages
+
+Let's first add melpa and install all packages:
+
+#+BEGIN_SRC emacs-lisp
+    (package-initialize)
+    (add-to-list 'package-archives
+		 '("melpa" . "https://melpa.org/packages/"))
+#+END_SRC
+
+I will also define an =install-if-needed= function. It will basically install a
+package that hasn't been installed yet:
+
+#+BEGIN_SRC emacs-lisp
+  (defun install-if-needed (package)
+    (unless (package-installed-p package)
+      (package-install package)))
+#+END_SRC
+
+I will also define a =my-packages= variable, containing all the packages that
+I will be using:
+
+#+BEGIN_SRC emacs-lisp
+  (setq my-packages
+	'(
+	  ;; Useful packages
+	  company ; for autocompletion
+	  company-jedi ; python autocompletion
+	  rainbow-delimiters ; sets colours to parenthesis
+	  smartparens ; smart parenthesis
+	  yasnippet ; snippets :p
+	  yasnippet-snippets
+
+	  ;; Python-specific
+	  jedi
+	  pytest
+
+	  ;; HTML-specific
+	  emmet-mode
+
+	  ;; ORG specific
+	  org-bullets
+
+	  ;; Other
+	  simplicity-theme ; the theme
+	  treemacs
+	  helm
+	  ))
+#+END_SRC
+
+And finally, we will call =install-if-needed= passing the contents of
+=my-packages=:
+
+#+BEGIN_SRC emacs-lisp
+  (mapc 'install-if-needed my-packages)
+#+END_SRC
+
+** Auto-completion
+
+Let's get started by setting up company and enabling it:
+
+#+BEGIN_SRC emacs-lisp
+  (global-company-mode t)
+
+  ;; Python company
+  (require 'company-jedi)
+#+END_SRC
+
+** Snippets
+
+Let's load yasnippet:
+
+#+BEGIN_SRC emacs-lisp
+  (require 'yasnippet)
+  (yas-global-mode 1)
+#+END_SRC
+
+** Language specific settings
+
+*** Python
+
+**NOTE:** Don't forget to install =jedi= using =pip=.
+
+I will just change some parameters for jedi:
+
+#+BEGIN_SRC emacs-lisp
+  (setq
+   jedi:complete-on-dot t
+   jedi:setup-keys t
+   py-electric-colon-active t
+   py-smart-indentation t)
+#+END_SRC
+
+And add a hook to it:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook
+	    (lambda ()
+	      (add-to-list 'company-backends 'company-jedi)
+	      (hack-local-variables)
+	      (jedi:setup)
+	      (local-set-key "\C-cd" 'jedi:show-doc)
+	      (local-set-key (kbd "M-.") 'jedi:goto-definition)
+	      (local-set-key (kbd "M-D") 'ca-python-remove-pdb)
+	      (local-set-key [f6] 'pytest-module)))
+#+END_SRC
+
+*** HTML
+
+Let's setup emmet mode:
+
+#+BEGIN_SRC emacs-lisp
+  (require 'emmet-mode)
+  (add-hook 'sgml-mode-hook 'emmet-mode)
+  (add-hook 'css-mode-hook 'emmet-mode)
+#+END_SRC
+
+*** Org
+
+Let's first setup =org-bullets= so it looks pretty:
+
+#+BEGIN_SRC emacs-lisp
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+END_SRC
+
+**** Babel
+
+Let's first setup babel with the languages I use the most:
+
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . nil)
+     (python . t)
+     (C . t)))
+#+END_SRC
+
+** Other stuff
+
+*** Theme
+
+Let's just load the =simplicity= theme:
+
+#+BEGIN_SRC emacs-lisp
+  (load-theme 'simplicity t)
+#+END_SRC
+
+*** Displays
+
+Let's add =rainbow-delimiters-mode= to the =prog-mode-hook=:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+#+END_SRC
+
+Let's also enable the =smartparens=, this is basically parenthesis autocomplete
+and several other stuff:
+
+#+BEGIN_SRC emacs-lisp
+  (smartparens-global-mode t)
+  (show-paren-mode t)
+#+END_SRC
+
+Display line number and column:
+
+#+BEGIN_SRC emacs-lisp
+  (column-number-mode t)
+  (global-linum-mode t)
+#+END_SRC
+
+Enable which-function:
+
+#+BEGIN_SRC emacs-lisp
+  (which-function-mode t)
+#+END_SRC
+
+*** Treemacs
+
+Let's load and enable treemacs:
+
+#+BEGIN_SRC emacs-lisp
+  (require 'treemacs)
+  (global-set-key (kbd "<f8>") #'treemacs)
+#+END_SRC
+
+*** Helm
+
+Let's load and enable helm:
+
+#+BEGIN_SRC emacs-lisp
+  (helm-mode)
+  (define-key global-map [remap find-file] #'helm-find-files)
+  (define-key global-map [remap execute-extended-command] #'helm-M-x)
+  (define-key global-map [remap switch-to-buffer] #'helm-mini)
+#+END_SRC
+
+*** Disabling some emacs things
+
+Let's disabled the startup message, the menu-bar, the scroll-bar, and those
+things I don't like :3
+
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (global-linum-mode t)
+  (setq create-lockfiles nil)
+#+END_SRC
