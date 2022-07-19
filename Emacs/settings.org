@@ -29,32 +29,33 @@ I will be using:
 
 #+BEGIN_SRC emacs-lisp
   (setq my-packages
-	'(
-	  ;; Useful packages
-	  company ; for autocompletion
-	  company-jedi ; python autocompletion
-	  rainbow-delimiters ; sets colours to parenthesis
-	  smartparens ; smart parenthesis
-	  yasnippet ; snippets :p
-	  yasnippet-snippets
+        '(
+          ;; Useful packages
+          company ; for autocompletion
+          company-jedi ; python autocompletion
+          rainbow-delimiters ; sets colours to parenthesis
+          smartparens ; smart parenthesis
+          yasnippet ; snippets :p
+          yasnippet-snippets
 
-	  ;; Python-specific
-	  jedi
-	  pytest
+          ;; Python-specific
+          jedi
+          pytest
 
-	  ;; HTML-specific
-	  emmet-mode
+          ;; HTML-specific
+          emmet-mode
 
-	  ;; ORG specific
-	  org-bullets
+          ;; ORG specific
+          org-bullets
 
-	  ;; Other
-	  simplicity-theme ; the theme
-	  all-the-icons
-	  treemacs
-	  treemacs-all-the-icons
-	  helm
-	  ))
+          ;; Other
+          simplicity-theme ; the theme
+          all-the-icons
+          treemacs
+          treemacs-all-the-icons
+          visual-fill-column
+          helm
+          ))
 #+END_SRC
 
 And finally, we will call =install-if-needed= passing the contents of
@@ -126,11 +127,34 @@ Let's setup emmet mode:
 
 *** Org
 
-Let's first setup =org-bullets= so it looks pretty:
+Let's set up our org-mode:
 
 #+BEGIN_SRC emacs-lisp
+  (defun org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode)
+    (visual-line-mode 1))
+
+  (require 'org)
   (require 'org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+  (setq org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●"))
+
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (org-mode-setup)
+              (org-bullets-mode)))
+#+END_SRC
+
+Let's also center our org buffers:
+
+#+BEGIN_SRC emacs-lisp
+  (require 'visual-fill-column)
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (setq visual-fill-column-width 100
+                    visual-fill-column-center-text t)
+              (visual-fill-column-mode 1)))
 #+END_SRC
 
 **** Babel
@@ -171,13 +195,6 @@ and several other stuff:
   (show-paren-mode t)
 #+END_SRC
 
-Display line number and column:
-
-#+BEGIN_SRC emacs-lisp
-  (column-number-mode t)
-  (global-linum-mode t)
-#+END_SRC
-
 Enable which-function:
 
 #+BEGIN_SRC emacs-lisp
@@ -204,17 +221,32 @@ Let's load and enable helm:
   (define-key global-map [remap switch-to-buffer] #'helm-mini)
 #+END_SRC
 
-*** Disabling some emacs things
+*** Tweaking the UI
 
-Let's disabled the startup message, the menu-bar, the scroll-bar, and those
-things I don't like :3
+Let's modify some things of the emacs UI:
 
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t)
-  (menu-bar-mode -1)
+
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
-  (global-linum-mode t)
+  (tooltip-mode -1)
+
+  (menu-bar-mode -1)
+
+  (setq visible-bell t)
+
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+		  term-mode-hook
+		  shell-mode-hook
+		  treemacs-mode-hook
+		  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
   (setq create-lockfiles nil)
 #+END_SRC
 
