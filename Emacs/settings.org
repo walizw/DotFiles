@@ -179,6 +179,16 @@ Let's just load the =simplicity= theme:
   (load-theme 'simplicity t)
 #+END_SRC
 
+*** Font
+
+Let's also set the =Fira Code= and =Cantarel= fonts:
+
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'default nil :font "Fira Code Retina" :height 100)
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 100)
+  (set-face-attribute 'variable-pitch nil :font "Fira Code Retina" :height 100 :weight 'regular)
+#+END_SRC
+
 *** Displays
 
 Let's add =rainbow-delimiters-mode= to the =prog-mode-hook=:
