@@ -50,7 +50,9 @@ I will be using:
 
 	  ;; Other
 	  simplicity-theme ; the theme
+	  all-the-icons
 	  treemacs
+	  treemacs-all-the-icons
 	  helm
 	  ))
 #+END_SRC
@@ -86,7 +88,7 @@ Let's load yasnippet:
 
 *** Python
 
-**NOTE:** Don't forget to install =jedi= using =pip=.
+*NOTE:* Don't forget to install =jedi= using =pip=.
 
 I will just change some parameters for jedi:
 
@@ -214,4 +216,27 @@ things I don't like :3
   (tool-bar-mode -1)
   (global-linum-mode t)
   (setq create-lockfiles nil)
+#+END_SRC
+
+*** All the icons
+
+To display pretty icons (only when using the GTK UI):
+
+#+BEGIN_SRC emacs-lisp
+  (when (display-graphic-p)
+    (require 'all-the-icons))
+#+END_SRC
+
+*NOTE:* If it's the first time running, don't forget to execute
+=M-x all-the-icons-install-fonts= and =fc-cache -f -v=.
+
+**** Treemacs
+
+Of course we want to use =all-the-icons= in the treemacs buffer, so let's load
+the =all-the-icons= theme for treemacs:
+
+#+BEGIN_SRC emacs-lisp
+  (when (display-graphic-p)
+    (require 'treemacs-all-the-icons)
+    (treemacs-load-theme "all-the-icons"))
 #+END_SRC
