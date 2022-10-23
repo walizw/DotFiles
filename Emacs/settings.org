@@ -29,33 +29,37 @@ I will be using:
 
 #+BEGIN_SRC emacs-lisp
   (setq my-packages
-        '(
-          ;; Useful packages
-          company ; for autocompletion
-          company-jedi ; python autocompletion
-          rainbow-delimiters ; sets colours to parenthesis
-          smartparens ; smart parenthesis
-          yasnippet ; snippets :p
-          yasnippet-snippets
+	'(
+	  ;; Useful packages
+	  company ; for autocompletion
+	  company-jedi ; python autocompletion
+	  rainbow-delimiters ; sets colours to parenthesis
+	  smartparens ; smart parenthesis
+	  yasnippet ; snippets :p
+	  yasnippet-snippets
 
-          ;; Python-specific
-          jedi
-          pytest
+	  ;; Python-specific
+	  jedi
+	  pytest
 
-          ;; HTML-specific
-          emmet-mode
+	  ;; C-specific
+	  lsp-mode
+	  lsp-treemacs
+	  helm-lsp
 
-          ;; ORG specific
-          org-bullets
+	  ;; HTML-specific
+	  emmet-mode
 
-          ;; Other
-          simplicity-theme ; the theme
-          all-the-icons
-          treemacs
-          treemacs-all-the-icons
-          visual-fill-column
-          helm
-          ))
+	  ;; ORG specific
+	  org-bullets
+
+	  ;; Other
+	  all-the-icons
+	  treemacs
+	  treemacs-all-the-icons
+	  visual-fill-column
+	  helm
+	  ))
 #+END_SRC
 
 And finally, we will call =install-if-needed= passing the contents of
@@ -115,6 +119,30 @@ And add a hook to it:
 	      (local-set-key [f6] 'pytest-module)))
 #+END_SRC
 
+*** C
+
+#+BEGIN_SRC emacs-lisp
+  (require 'lsp-mode)
+  (add-hook 'c-mode-hook 'lsp)
+
+  (setq gc-cons-threshold (* 100 1024 1024)
+        read-process-output-max (* 1024 1024)
+        treemacs-space-between-root-nodes nil
+        company-idle-delay 0.0
+        company-minimum-prefix-length 1
+        lsp-idle-delay 0.1)  ;; clangd is fast
+
+  (with-eval-after-load 'lsp-mode
+    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+    (yas-global-mode))
+
+  (defun format-c-after-save ()
+    (when (eq major-mode 'c-mode)
+      (lsp-format-buffer)))
+
+  (add-hook 'after-save-hook 'format-c-after-save)
+#+END_SRC
+
 *** HTML
 
 Let's setup emmet mode:
@@ -170,14 +198,6 @@ Let's first setup babel with the languages I use the most:
 #+END_SRC
 
 ** Other stuff
-
-*** Theme
-
-Let's just load the =simplicity= theme:
-
-#+BEGIN_SRC emacs-lisp
-  (load-theme 'simplicity t)
-#+END_SRC
 
 *** Font
 
