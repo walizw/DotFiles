@@ -140,7 +140,7 @@ And add a hook to it:
     (when (eq major-mode 'c-mode)
       (lsp-format-buffer)))
 
-  (add-hook 'after-save-hook 'format-c-after-save)
+  (add-hook 'before-save-hook 'format-c-after-save)
 #+END_SRC
 
 *** HTML
